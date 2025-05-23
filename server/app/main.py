@@ -1,6 +1,7 @@
+import secrets
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware # For frontend later
-
+from starlette.middleware.sessions import SessionMiddleware
 from .config import settings # App settings
 from .routers import auth_router # Import your auth router
 # from .db.database import engine, Base # If you were creating tables directly
@@ -12,6 +13,12 @@ from .routers import auth_router # Import your auth router
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url="/api/v1/openapi.json" # Standard practice to version your API docs URL
+)
+
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.SECRET_KEY,
 )
 
 # CORS (Cross-Origin Resource Sharing) - for when your frontend is on a different domain/port
