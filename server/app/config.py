@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     DEFAULT_LSTM_SEQUENCE_LENGTH: int = 10
     DEFAULT_LSTM_EPOCHS: int = 50
     DEFAULT_LSTM_BATCH_SIZE: int = 32
+    DEFAULT_LSTM_HIDDEN_SIZE: int = 128
+    DEFAULT_LSTM_NUM_LAYERS: int = 3
+    DEFAULT_PREDICTION_LR: float = 0.001
+    DEFAULT_PREDICTION_TEST_SIZE: float = 0.1 # Smaller test set if training on limited history for prediction
    
     # # --- OAuth - Facebook ---
     # FACEBOOK_CLIENT_ID: Optional[str] = None

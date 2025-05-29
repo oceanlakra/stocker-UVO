@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware # For frontend later
 from starlette.middleware.sessions import SessionMiddleware
 from .config import settings # App settings
-from .routers import auth_router, analysis_router, history_router# Import your auth router
+from .routers import auth_router, analysis_router, history_router, prediction_router# Import your auth router
 # from .db.database import engine, Base # If you were creating tables directly
 
 # Optional: If you weren't using Alembic and wanted FastAPI to create tables
@@ -45,6 +45,7 @@ app.add_middleware(
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(analysis_router.router, prefix="/api/v1")
 app.include_router(history_router.router, prefix="/api/v1")
+app.include_router(prediction_router.router, prefix="/api/v1")
 
 @app.get("/api/v1") # Root for v1 API
 async def api_root():
