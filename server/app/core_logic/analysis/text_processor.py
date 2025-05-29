@@ -1,5 +1,6 @@
 import re
 import nltk
+nltk.download('punkt_tab') #remove it after first run
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
