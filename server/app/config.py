@@ -19,6 +19,19 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: Optional[str] = None
     GOOGLE_REDIRECT_URI: Optional[str] = None # For backend callback
 
+    # Reddit API
+    REDDIT_CLIENT_ID: str
+    REDDIT_CLIENT_SECRET: str
+    REDDIT_USER_AGENT: str
+
+    # Prediction Defaults
+    DEFAULT_STOCK_SYMBOL: str = "SPY"
+    DEFAULT_DAYS_BACK_REDDIT: int = 30
+    DEFAULT_DAYS_MARKET_DATA: int = 365
+    DEFAULT_LSTM_SEQUENCE_LENGTH: int = 10
+    DEFAULT_LSTM_EPOCHS: int = 50
+    DEFAULT_LSTM_BATCH_SIZE: int = 32
+   
     # # --- OAuth - Facebook ---
     # FACEBOOK_CLIENT_ID: Optional[str] = None
     # FACEBOOK_CLIENT_SECRET: Optional[str] = None
