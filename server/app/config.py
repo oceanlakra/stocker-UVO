@@ -5,6 +5,14 @@ class Settings(BaseSettings):
     #Project Settings
     PROJECT_NAME: str
     
+    #Historical Data Path
+    HISTORICAL_DATA_PATH: str = "data/historical_intraday_csvs"
+    # Defaults for Comparison API
+    DEFAULT_COMPARISON_START_TIME: str = "09:15" # HH:MM format
+    DEFAULT_COMPARISON_END_TIME: str = "09:45"   # HH:MM format
+    DEFAULT_COMPARISON_N_RESULTS: int = 5
+    DEFAULT_COMPARISON_SIMILARITY_THRESHOLD: float = 0.90
+
     #Database Settings
     DATABASE_URL: str
     
@@ -14,7 +22,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     # REFRESH_TOKEN_EXPIRE_DAYS: int
 
-     # --- OAuth - Google ---
+    # --- OAuth - Google ---
     GOOGLE_CLIENT_ID: Optional[str] = None
     GOOGLE_CLIENT_SECRET: Optional[str] = None
     GOOGLE_REDIRECT_URI: Optional[str] = None # For backend callback
