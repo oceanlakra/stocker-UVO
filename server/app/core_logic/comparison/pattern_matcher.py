@@ -79,8 +79,10 @@ def find_similar_historical_patterns(
     now_utc = datetime.now(timezone.utc)
     yf_query_start = (now_utc - timedelta(days=1)).strftime('%Y-%m-%d') # Start from yesterday to be safe
     yf_query_end = (now_utc + timedelta(days=1)).strftime('%Y-%m-%d')   # End tomorrow to be safe
-
-    df_today_full_day = yf.download(stock_symbol, start=yf_query_start, end=yf_query_end, interval="5m", progress=False)
+    
+    # Create Ticker object with .NS suffix and get data
+    ticker = yf.Ticker(f"{stock_symbol}.NS")
+    df_today_full_day = ticker.history(interval="5m", period="1d")
     
     if df_today_full_day.empty:
         raise ValueError(f"Could not fetch today's 5-min data for {stock_symbol} via yfinance.")
