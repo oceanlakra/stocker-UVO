@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { getCurrentUser } from './features/auth/authSlice';
@@ -8,6 +7,12 @@ import { LoginForm } from './components/auth/LoginForm';
 import { RegisterForm } from './components/auth/RegisterForm';
 import { GoogleCallback } from './components/auth/GoogleCallback';
 import { Dashboard } from './components/Dashboard';
+import { Layout } from "@/components/layout/Layout";
+import { Home } from "@/pages/Home";
+import { Analysis } from "@/pages/Analysis";
+import { Comparison } from "@/pages/Comparison";
+import { Prediction } from "@/pages/Prediction";
+import { Login } from "@/pages/Login";
 import './App.css';
 
 function App() {
@@ -32,6 +37,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Authentication routes */}
         <Route 
           path="/" 
           element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />} 
@@ -45,35 +51,37 @@ function App() {
           element={!isAuthenticated ? <RegisterForm /> : <Navigate to="/dashboard" />} 
         />
         <Route path="/auth/google/callback" element={<GoogleCallback />} />
+        
+        {/* Protected dashboard route */}
         <Route 
           path="/dashboard" 
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
         />
-      </Routes>
-    </Router>
-=======
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Layout } from "@/components/layout/Layout";
-import { Home } from "@/pages/Home";
-import { Analysis } from "@/pages/Analysis";
-import { Comparison } from "@/pages/Comparison";
-import { Prediction } from "@/pages/Prediction";
-import { Login } from "@/pages/Login";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
+        {/* Main application routes (protected) */}
+        <Route 
+          path="/app" 
+          element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
+        >
           <Route index element={<Home />} />
           <Route path="analysis" element={<Analysis />} />
           <Route path="comparison" element={<Comparison />} />
           <Route path="prediction" element={<Prediction />} />
-          <Route path="login" element={<Login />} />
         </Route>
+
+        {/* Alternative login route that uses the Login page component */}
+        <Route 
+          path="/alt-login" 
+          element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} 
+        />
+
+        {/* Catch all route - redirect to appropriate page */}
+        <Route 
+          path="*" 
+          element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} />} 
+        />
       </Routes>
-    </BrowserRouter>
->>>>>>> 88770b0b3af739fa75a2a9e5cd9626df32f3061f
+    </Router>
   );
 }
 

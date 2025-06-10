@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-@import "tailwindcss";
-
-/* Example from ShadCN globals.css */
-:root {
-  --font-sans: "Inter", sans-serif; /* Or whatever ShadCN configured */
-  /* ... other variables ... */
-}
-
-@layer base {
-  body {
-    @apply font-sans; /* Applies the default sans font to the body */
-=======
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,6 +24,7 @@
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
+    --font-sans: "Inter", sans-serif;
   }
 
   .dark {
@@ -66,8 +54,8 @@
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
->>>>>>> 88770b0b3af739fa75a2a9e5cd9626df32f3061f
+    @apply bg-background text-foreground font-sans;
   }
 }
