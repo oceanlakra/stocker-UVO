@@ -1,24 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { Button } from "@/components/ui/button";
-
-
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { getCurrentUser } from './features/auth/authSlice';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { LandingPage } from './components/LandingPage';
+import { LoginForm } from './components/auth/LoginForm';
+import { RegisterForm } from './components/auth/RegisterForm';
+import { GoogleCallback } from './components/auth/GoogleCallback';
+import { Dashboard } from './components/Dashboard';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, isLoading, token } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    // If we have a token, try to get current user
+    if (token && !isAuthenticated) {
+      dispatch(getCurrentUser());
+    }
+  }, [dispatch, token, isAuthenticated]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <h1 className='text-3xl font-bold underline'>
-        Vite + React + Tailwind CSS
-      </h1>
-      <div className="flex min-h-svh flex-col items-center justify-center">
-      <Button>Click me</Button>
-    </div>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route 
+          path="/" 
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />} 
+        />
+        <Route 
+          path="/login" 
+          element={!isAuthenticated ? <LoginForm /> : <Navigate to="/dashboard" />} 
+        />
+        <Route 
+          path="/register" 
+          element={!isAuthenticated ? <RegisterForm /> : <Navigate to="/dashboard" />} 
+        />
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
+        <Route 
+          path="/dashboard" 
+          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+        />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

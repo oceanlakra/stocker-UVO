@@ -21,7 +21,7 @@ def register_user(
     created_user = crud.user_crud.create_user(db=db, user=user)
     return created_user # Pydantic will automatically convert if needed
 
-@router.post("/login", response_model=schemas.token_schemas.Token)
+@router.post("/login/access-token", response_model=schemas.token_schemas.Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
@@ -37,67 +37,89 @@ async def login_for_access_token(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
     
     access_token = auth.jwt_handler.create_access_token(data={"user_id": user.id})
-    # refresh_token = auth.jwt_handler.create_refresh_token(data={"user_id": user.id}) # Optional
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        # "refresh_token": refresh_token # Optional
     }
 
 @router.get("/me", response_model=schemas.user_schemas.User)
 async def read_users_me(
     current_user: schemas.user_schemas.User = Depends(dependencies.get_current_active_user)
 ):
-    # current_user is already a Pydantic model from get_current_active_user
     return current_user
-
 
 # --- Google OAuth Routes ---
 @router.get("/google/login")
 async def login_via_google(request: Request):
-    if not config.settings.GOOGLE_REDIRECT_URI: # Check if configured
+    if not config.settings.GOOGLE_REDIRECT_URI: 
         raise HTTPException(status_code=500, detail="Google OAuth not configured")
     # The redirect_uri for authorize_redirect must match one in Google Cloud Console
     return await oauth.google.authorize_redirect(request, config.settings.GOOGLE_REDIRECT_URI)
 
-@router.get("/google/callback", response_model=schemas.token_schemas.Token) # Or RedirectResponse to frontend
+@router.get("/google/callback")
 async def google_auth_callback(request: Request, db: Session = Depends(get_db)):
-    if not config.settings.GOOGLE_CLIENT_ID: # Check if configured
+    # Frontend URL - adjust port if your frontend runs on different port
+    FRONTEND_URL = "http://localhost:5173"  # Change to 3000 if using Create React App
+    
+    if not config.settings.GOOGLE_CLIENT_ID:
         raise HTTPException(status_code=500, detail="Google OAuth not configured")
+    
     try:
         token = await oauth.google.authorize_access_token(request)
+        print(f"Received token from Google: {token}")  # Debug log
     except Exception as e:
-        # Log the actual error from Authlib for debugging
         print(f"Google OAuth Error: {e}")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Could not get access token from Google: {e}")
+        frontend_error_url = f"{FRONTEND_URL}/login?error=oauth_failed"
+        return RedirectResponse(url=frontend_error_url)
 
-    user_info = token.get('userinfo') # userinfo is standard in OIDC
+    user_info = token.get('userinfo')
     if not user_info or not user_info.get('email'):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Could not fetch user info from Google")
+        print(f"User info error: {user_info}")  # Debug log
+        frontend_error_url = f"{FRONTEND_URL}/login?error=user_info_failed"
+        return RedirectResponse(url=frontend_error_url)
 
     email = user_info.get('email')
     full_name = user_info.get('name')
-    google_id = user_info.get('sub') # 'sub' (subject) is the standard unique ID in OIDC
-
-    db_user = crud.user_crud.get_or_create_user_by_oauth(
-        db, email=email, full_name=full_name, provider_name="google", provider_user_id=google_id
-    )
-
-    access_token = auth.jwt_handler.create_access_token(data={"user_id": db_user.id})
+    google_id = user_info.get('sub')
     
-    # IMPORTANT FOR FRONTEND INTEGRATION LATER:
-    # Instead of returning the token directly, you'll usually redirect to your frontend
-    # with the token in a query parameter or set it in an HttpOnly cookie.
-    # Example frontend redirect:
-    # frontend_url = f"http://localhost:3000/oauth-callback?token={access_token}" # Assuming React runs on 3000
-    # return RedirectResponse(url=frontend_url)
-    
-    # For now, returning token directly for backend testing:
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-    }
+    print(f"User info - Email: {email}, Name: {full_name}, ID: {google_id}")  # Debug log
+
+    try:
+        # Check if user exists
+        db_user = crud.user_crud.get_user_by_email(db, email=email)
+        
+        if not db_user:
+            # Create new user if doesn't exist
+            user_create = schemas.user_schemas.UserCreate(
+                email=email,
+                full_name=full_name,
+                password="",  # No password for OAuth users
+                is_active=True
+            )
+            db_user = crud.user_crud.create_user(db=db, user=user_create)
+            # Update google_id if your user model has this field
+            if hasattr(db_user, 'google_id'):
+                db_user.google_id = google_id
+                db.commit()
+        else:
+            # Update google_id for existing user if not set
+            if hasattr(db_user, 'google_id') and not db_user.google_id:
+                db_user.google_id = google_id
+                db.commit()
+
+        access_token = auth.jwt_handler.create_access_token(data={"user_id": db_user.id})
+        print(f"Generated access token for user {db_user.id}")  # Debug log
+        
+        # Redirect to frontend with token
+        frontend_url = f"{FRONTEND_URL}/auth/google/callback?access_token={access_token}"
+        print(f"Redirecting to: {frontend_url}")  # Debug log
+        return RedirectResponse(url=frontend_url)
+        
+    except Exception as e:
+        print(f"Database Error during OAuth: {e}")
+        frontend_error_url = f"{FRONTEND_URL}/login?error=database_error"
+        return RedirectResponse(url=frontend_error_url)
 
 
 # # --- Facebook OAuth Routes ---

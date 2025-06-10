@@ -27,8 +27,9 @@ app.add_middleware(
 # CORS (Cross-Origin Resource Sharing) - for when your frontend is on a different domain/port
 # For now, allow all origins for local development. Be more restrictive in production.
 origins = [
-    "http://localhost",
-    "http://localhost:3000", # Default React dev port
+    "http://localhost:5173", # Default Vite dev port
+    "http://localhost:3000",
+    "http://127.0.0.1:5173" # Default React dev port
     # Add other origins if needed
 ]
 

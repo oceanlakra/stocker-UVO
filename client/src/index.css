@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+/* Example from ShadCN globals.css */
+:root {
+  --font-sans: "Inter", sans-serif; /* Or whatever ShadCN configured */
+  /* ... other variables ... */
+}
+
+@layer base {
+  body {
+    @apply font-sans; /* Applies the default sans font to the body */
+  }
+}
