@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit'; // Correct type-only import
 import * as authService from './authService'; // Assuming this correctly exports RegisterData, LoginData, User
-import type { RootState } from '../../store'; // Correct import for RootState
+import type { RootState } from '../../store/rootReducer'; // Correct import for RootState
 
 // Define a type for the user data based on your backend's /me response
 // This User type should ideally be consistent with the User type in authService.ts

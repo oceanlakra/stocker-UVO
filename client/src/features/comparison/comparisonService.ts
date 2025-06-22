@@ -1,29 +1,75 @@
 // src/features/comparison/comparisonService.ts
-import axiosInstance from '@/lib/axios'; // Your configured Axios instance
-import { ComparisonOutput } from './comparisonSlice.ts'; // Import the output type
+import axios from 'axios';
 
-// Input type matching backend ComparisonInput schema
-export interface ComparisonInputData {
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+
+// --- Type Definitions (matching backend schemas) ---
+
+// Input for the API call, allowing for optional parameters
+export interface ComparisonInput {
   stock_symbol: string;
-  is_indian_market: boolean;
-  start_time?: string | null; // Optional because they have defaults
-  end_time?: string | null;
-  num_results?: number | null;
-  similarity_threshold?: number | null;
+  start_time?: string;       // e.g., "09:30"
+  end_time?: string;         // e.g., "16:00"
+  num_results?: number;
+  similarity_threshold?: number;
 }
 
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/comparison`;
+// A single data point for the intraday charts
+// FIX: Renamed and updated to handle full OHLC data for candlestick charts.
+export interface CandlestickDataPoint {
+  time: string;  // e.g., "09:30:00"
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
 
-// Find similar patterns
-export const findSimilarPatterns = async (
-  inputData: ComparisonInputData,
-  token: string // Token passed explicitly for services, or rely on interceptor
-): Promise<ComparisonOutput> => {
-  const response = await axiosInstance.post<ComparisonOutput>(
-    `${API_URL}/find-similar-patterns`,
-    inputData,
-    // Interceptor should handle token, but explicit for clarity if needed:
-    // { headers: { Authorization: `Bearer ${token}` } }
+// A single historical pattern that matches the query
+export interface HistoricalPattern {
+  stock_symbol: string;
+  date: string;
+  similarity_score: number;
+  data: CandlestickDataPoint[]; // FIX: Use the new CandlestickDataPoint type
+}
+
+// The final structure of the successful API response
+export interface ComparisonResponse {
+  query_stock_symbol: string;
+  query_date: string;
+  query_time_window: string;
+  similar_historical_patterns: HistoricalPattern[];
+  message?: string; // Optional message from the backend
+}
+
+// --- API Function ---
+
+/**
+ * Fetches similar historical stock patterns from the backend.
+ * @param input The comparison parameters from the user.
+ * @param token The user's JWT for authentication.
+ * @returns A promise that resolves to the comparison results.
+ */
+const findSimilarPatterns = async (
+  input: ComparisonInput,
+  token: string
+): Promise<ComparisonResponse> => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.post(
+    `${API_URL}/comparison/find-similar-patterns`,
+    input,
+    config
   );
+
   return response.data;
 };
+
+const comparisonService = {
+  findSimilarPatterns,
+};
+
+export default comparisonService;

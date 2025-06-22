@@ -22,7 +22,7 @@ const OAuthCallbackPage: React.FC = () => {
     dispatch(resetAuthStatus()); // Clear previous auth state messages
 
     const params = new URLSearchParams(location.search);
-    const token = params.get('token');
+    const token = params.get('access_token');
     const oauthError = params.get('error'); // Backend might send error if its own OAuth step failed
     const oauthErrorDescription = params.get('error_description');
 

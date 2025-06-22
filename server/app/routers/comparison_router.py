@@ -32,20 +32,33 @@ async def find_similar_intraday_patterns(
         query_start_time_obj = dt.datetime.strptime(effective_start_time_str, '%H:%M').time()
         query_end_time_obj = dt.datetime.strptime(effective_end_time_str, '%H:%M').time()
 
+        # --- FIX: Dynamically find the last trading day ---
+        # This makes testing reliable and independent of market hours.
+        query_date = dt.datetime.now(dt.timezone.utc).date()
+        weekday = query_date.weekday() # Monday is 0, Sunday is 6
+
+        if weekday == 5: # If today is Saturday
+            query_date -= dt.timedelta(days=1) # Use Friday's date
+        elif weekday == 6: # If today is Sunday
+            query_date -= dt.timedelta(days=2) # Use Friday's date
+        # This logic can be expanded to handle public holidays if needed.
+
         similar_results = pattern_matcher.find_similar_historical_patterns(
-            stock_symbol=comparison_input.stock_symbol.upper(), # Standardize symbol
+            stock_symbol=comparison_input.stock_symbol.upper(),
             query_start_time=query_start_time_obj,
             query_end_time=query_end_time_obj,
             similarity_threshold=effective_threshold,
-            num_results=effective_n_results
+            num_results=effective_n_results,
+            query_date_override=query_date # Pass the adjusted date to the core logic
         )
 
-        today_query_date = dt.datetime.now(dt.timezone.utc).date().isoformat()
+        # Use the adjusted date for the response, for consistency
+        response_query_date = query_date.isoformat()
 
         api_output = schemas.comparison_schemas.ComparisonOutput(
             query_stock_symbol=comparison_input.stock_symbol.upper(),
             query_time_window=f"{effective_start_time_str}-{effective_end_time_str}",
-            query_date=today_query_date,
+            query_date=response_query_date,
             similar_historical_patterns=similar_results
         )
         

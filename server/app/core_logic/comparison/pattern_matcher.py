@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import yfinance as yf
 from datetime import datetime, time as dt_time, date as dt_date, timedelta, timezone
+import datetime as dt
 from typing import List, Tuple, Dict, Any
 from .data_loader import load_historical_data
 
@@ -38,15 +39,19 @@ def _filter_by_time_window(df: pd.DataFrame, start_time_obj: dt_time, end_time_o
 
 def find_similar_historical_patterns(
     stock_symbol: str,
-    query_start_time: dt_time, # Python time object
-    query_end_time: dt_time,   # Python time object
+    query_start_time: dt.time, # Python time object
+    query_end_time: dt.time,   # Python time object
     similarity_threshold: float,
-    num_results: int
+    num_results: int,
+    query_date_override: dt.date | None = None # Ensure this parameter exists
 ) -> List[Dict[str, Any]]:
     """
-    Finds historical intraday patterns similar to today's pattern for a given stock
-    within a specified time window.
+    Finds historical intraday patterns similar to the specified stock's pattern.
+    If query_date_override is provided, it uses that date. Otherwise, it uses today.
     """
+    # Determine the date to fetch data for the query pattern
+    final_query_date = query_date_override if query_date_override else dt.datetime.now(dt.timezone.utc).date()
+
     # 1. Load historical data for the stock
     df_historical_full = load_historical_data(stock_symbol)
     if df_historical_full is None or df_historical_full.empty:
@@ -58,7 +63,7 @@ def find_similar_historical_patterns(
     
     # 2. Fetch "today's" data (query pattern) using yfinance for 5-min interval
     # We need data for today up to query_end_time
-    today_date = datetime.now(timezone.utc).date()
+    today_date = final_query_date
     # yfinance intraday often needs start and end datetimes for the current day
     # Fetch a bit more to ensure we cover the window, e.g., from market open
     yf_start_dt = datetime.combine(today_date, dt_time(hour=0, minute=0), tzinfo=timezone.utc) # Start of today UTC
