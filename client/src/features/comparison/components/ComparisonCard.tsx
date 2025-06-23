@@ -14,28 +14,24 @@ export function ComparisonCard() {
   const dispatch = useAppDispatch();
   const { data, isLoading, isError, message } = useAppSelector((state) => state.comparison);
   const [formState, setFormState] = useState<ComparisonInput>({
-    stock_symbol: 'AAPL',
+    stock_symbol: 'HEROMOTOCO', // FIX: Default to a stock that works
     start_time: '09:30',
-    end_time: '16:00',
+    end_time: '09:45', // FIX: Shorter window for testing
     num_results: 3,
     similarity_threshold: 0.90,
   });
 
-  // 2. ADD THIS DEBUGGING BLOCK
+  // FIX: Improved debugging
   useEffect(() => {
-    if (data?.similar_historical_patterns?.length > 0) {
-      console.log("--- API Response Received in Component ---");
-      const firstPattern = data.similar_historical_patterns[0];
-      console.log("Checking the first historical pattern found:", firstPattern);
-      // Check if the correct data key exists and has data
-      if (firstPattern.full_day_data) {
-        console.log("Chart data found in 'full_day_data'. Length:", firstPattern.full_day_data.length);
-      } else {
-        console.error("ERROR: The key 'full_day_data' was not found in the pattern object.");
-      }
+    if ((data?.similar_historical_patterns?.length ?? 0) > 0) {
+      console.log("--- API Response Received ---");
+      console.log("Full data:", data);
+      const firstPattern = data ? data.similar_historical_patterns?.[0] : undefined;
+      console.log("First pattern structure:", firstPattern);
+      console.log("Full day data length:", firstPattern?.full_day_data?.length || 0);
+      console.log("Window pattern data length:", firstPattern?.window_pattern_data?.length || 0);
     }
   }, [data]);
-  // --- END OF FIX ---
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,7 +55,7 @@ export function ComparisonCard() {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto mt-8">
+    <Card className="w-full max-w-6xl mx-auto mt-8">
       <CardHeader>
         <CardTitle>Intraday Pattern Comparison</CardTitle>
         <CardDescription>Find historical days with similar intraday price action to a stock's most recent trading day.</CardDescription>
@@ -67,6 +63,7 @@ export function ComparisonCard() {
       <CardContent>
         {!data ? (
           <form onSubmit={handleFetchComparison} className="space-y-4">
+            {/* ...existing form fields... */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="stock_symbol">Stock Symbol</Label>
@@ -94,8 +91,8 @@ export function ComparisonCard() {
             </Button>
           </form>
         ) : (
-          // Results Display
-          <div>
+          // FIX: Enhanced Results Display
+          <div className="space-y-6">
             <div className="text-center p-4 mb-6 bg-muted rounded-lg">
               <h3 className="text-xl font-bold">Results for {data.query_stock_symbol}</h3>
               <p className="text-sm text-muted-foreground">
@@ -104,19 +101,48 @@ export function ComparisonCard() {
             </div>
 
             {data.similar_historical_patterns.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {data.similar_historical_patterns.map((pattern, index) => (
-                  <Card key={index} className="overflow-hidden">
+              <div className="space-y-8">
+                {/* FIX: Show Today's Query Pattern */}
+                {data.similar_historical_patterns[0]?.window_pattern_data && (
+                  <Card className="border-primary/50">
                     <CardHeader>
-                      <CardTitle className="text-lg">{pattern.stock_symbol} on {pattern.date}</CardTitle>
-                      <CardDescription>Similarity Score: {(pattern.similarity_score * 100).toFixed(2)}%</CardDescription>
+                      <CardTitle className="text-lg text-primary">
+                        Query Pattern - {data.query_stock_symbol} on {data.query_date}
+                      </CardTitle>
+                      <CardDescription>
+                        This is the pattern we're comparing against ({data.query_time_window})
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {/* FIX: Pass `pattern.full_day_data` to the chart component */}
-                      <CandlestickChart data={pattern.full_day_data} chartDate={pattern.date} />
+                      <CandlestickChart 
+                        data={data.similar_historical_patterns[0].window_pattern_data} 
+                        title={`Query Pattern (${data.query_time_window})`}
+                        isQueryPattern={true}
+                      />
                     </CardContent>
                   </Card>
-                ))}
+                )}
+
+                {/* FIX: Show Similar Historical Patterns */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Similar Historical Patterns</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {data.similar_historical_patterns.map((pattern, index) => (
+                      <Card key={index} className="overflow-hidden">
+                        <CardHeader>
+                          <CardTitle className="text-lg">{data.query_stock_symbol} on {pattern.date}</CardTitle>
+                          <CardDescription>Similarity Score: {(pattern.similarity_score * 100).toFixed(2)}%</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <CandlestickChart 
+                            data={pattern.full_day_data} 
+                            title={`Full Day Chart - ${pattern.date}`}
+                          />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               <Alert>

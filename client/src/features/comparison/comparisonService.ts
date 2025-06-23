@@ -14,10 +14,9 @@ export interface ComparisonInput {
   similarity_threshold?: number;
 }
 
-// A single data point for the intraday charts
-// FIX: Renamed and updated to handle full OHLC data for candlestick charts.
+// FIX: Update to match the actual API response structure
 export interface CandlestickDataPoint {
-  time: string;  // e.g., "09:30:00"
+  date: string;  // e.g., "2020-12-04T09:15:00+05:30"
   open: number;
   high: number;
   low: number;
@@ -26,19 +25,20 @@ export interface CandlestickDataPoint {
 
 // A single historical pattern that matches the query
 export interface HistoricalPattern {
-  stock_symbol: string;
-  date: string;
+  date: string;  // e.g., "2020-12-04"
   similarity_score: number;
-  data: CandlestickDataPoint[]; // FIX: Use the new CandlestickDataPoint type
+  window_pattern_data: CandlestickDataPoint[]; // Pattern used for comparison
+  full_day_data: CandlestickDataPoint[]; // Full day data for chart display
 }
 
-// The final structure of the successful API response
+// FIX: Add query pattern to the response
 export interface ComparisonResponse {
   query_stock_symbol: string;
-  query_date: string;
   query_time_window: string;
+  query_date: string;
+  query_pattern_data?: CandlestickDataPoint[]; // Today's pattern data
   similar_historical_patterns: HistoricalPattern[];
-  message?: string; // Optional message from the backend
+  message?: string | null;
 }
 
 // --- API Function ---
