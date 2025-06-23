@@ -1,5 +1,6 @@
 import { PredictionCard } from "@/features/prediction/components/PredictionCard";
 import { ComparisonCard } from "@/features/comparison/components/ComparisonCard";
+import { RedditSentimentCard } from "@/features/analysis/components/RedditSentimentCard";
 
 export default function DashboardPage() {
   return (
@@ -12,8 +13,9 @@ export default function DashboardPage() {
       </div>
       
       {/* Feature Cards */}
-      <PredictionCard />
+      {/* <PredictionCard /> */}
       <ComparisonCard />
+      {/* <RedditSentimentCard /> */}
     </div>
   );
 }
