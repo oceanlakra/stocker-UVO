@@ -171,7 +171,7 @@ export const authSlice = createSlice({
         state.isSuccess = false;
         state.message = null;
       })
-      .addCase(register.fulfilled, (state, action: PayloadAction<authService.User>) => { // Type the action
+      .addCase(register.fulfilled, (state) => { // Type the action
         state.isLoading = false;
         state.isSuccess = true;
         // Registration returns the user object but doesn't log them in (no token)

@@ -1,6 +1,6 @@
-import { PredictionCard } from "@/features/prediction/components/PredictionCard";
+// import { PredictionCard } from "@/features/prediction/components/PredictionCard";
 import { ComparisonCard } from "@/features/comparison/components/ComparisonCard";
-import { RedditSentimentCard } from "@/features/analysis/components/RedditSentimentCard";
+// import { RedditSentimentCard } from "@/features/analysis/components/RedditSentimentCard";
 
 export default function DashboardPage() {
   return (

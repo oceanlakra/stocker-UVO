@@ -35,47 +35,6 @@ export function Comparison() {
   const [results, setResults] = useState<SimilarPattern[]>([]);
 
   // You can add this utility function
-  function isTokenExpired(token: string | null) {
-    if (!token) return true;
-    
-    try {
-      // Log the token to see what we're working with (remove in production)
-      console.log('Token being checked:', token.substring(0, 20) + '...');
-      
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        console.warn('Token does not appear to be in JWT format');
-        return false; // Let the API validate instead
-      }
-      
-      const base64Url = parts[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      
-      try {
-        const payload = JSON.parse(window.atob(base64));
-        console.log('Token payload:', payload);
-        
-        // Check if exp exists and if it's valid
-        if (!payload.exp) {
-          console.warn('No expiration found in token');
-          return false; // Let the API validate instead
-        }
-        
-        const expirationTime = payload.exp * 1000; // Convert to milliseconds
-        const currentTime = Date.now();
-        console.log('Token expires at:', new Date(expirationTime).toLocaleString());
-        console.log('Current time:', new Date(currentTime).toLocaleString());
-        
-        return expirationTime < currentTime;
-      } catch (parseError) {
-        console.error('Error parsing token payload:', parseError);
-        return false; // Let the API validate instead
-      }
-    } catch (e) {
-      console.error('Error checking token expiration:', e);
-      return false; // Let the API validate instead
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

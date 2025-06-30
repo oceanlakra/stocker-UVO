@@ -1,4 +1,3 @@
-import React from 'react';
 import Chart from 'react-apexcharts';
 import { type CandlestickDataPoint } from '../comparisonService';
 
@@ -8,7 +7,7 @@ interface CandlestickChartProps {
   isQueryPattern?: boolean;
 }
 
-export function CandlestickChart({ data, title, isQueryPattern = false }: CandlestickChartProps) {
+export function CandlestickChart({ data, title }: CandlestickChartProps) {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="w-full h-[300px] flex items-center justify-center bg-muted/50 rounded-lg">
@@ -60,7 +59,7 @@ export function CandlestickChart({ data, title, isQueryPattern = false }: Candle
     },
     tooltip: {
       shared: true,
-      custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+      custom: ({ seriesIndex, dataPointIndex, w }) => {
         const ohlc = w.globals.initialSeries[seriesIndex].data[dataPointIndex].y;
         return (
           `<div style="padding: 10px">

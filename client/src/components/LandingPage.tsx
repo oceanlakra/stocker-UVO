@@ -10,7 +10,6 @@ import {
   Shield, 
   Zap,
   Users,
-  ChevronDown
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

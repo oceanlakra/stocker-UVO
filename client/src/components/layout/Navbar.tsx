@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/features/auth/authSlice';
-import { Sun, Moon, LogOut, UserCircle2 } from 'lucide-react'; // Example icons
+import { Moon, LogOut, UserCircle2 } from 'lucide-react'; // Example icons
 // Import your theme toggle hook/function if you create one separately
 
 export function Navbar() {
