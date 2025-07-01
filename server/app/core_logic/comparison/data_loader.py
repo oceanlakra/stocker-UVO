@@ -30,7 +30,7 @@ def load_historical_data(stock_symbol: str) -> Optional[pd.DataFrame]:
     else:
         # Generic fallback, assuming STOCK_SYMBOL.csv - this will likely fail for other stocks
         # TODO: Implement a robust way to map symbol to filename or standardize filenames
-        filename = f"{stock_symbol_upper}_with_indicators_.csv"
+        filename = f"filtered_{stock_symbol_upper}_with_indicators_.csv"
         print(f"Warning: Using generic filename {filename} for {stock_symbol_upper}. Ensure this file exists or update mapping.")
 
 

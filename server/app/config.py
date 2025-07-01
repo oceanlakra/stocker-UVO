@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     
     #Historical Data Path
-    HISTORICAL_DATA_PATH: str = "data/historical_intraday_csvs"
+    HISTORICAL_DATA_PATH: str = "data/filtered_csvs"
     # Defaults for Comparison API
     DEFAULT_COMPARISON_START_TIME: str = "09:15" # HH:MM format
     DEFAULT_COMPARISON_END_TIME: str = "09:45"   # HH:MM format
