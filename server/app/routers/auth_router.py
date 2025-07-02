@@ -5,6 +5,7 @@ from starlette.responses import RedirectResponse
 from .. import schemas, crud, auth, dependencies, config # Local package imports
 from ..db.database import get_db # DB session dependency
 from ..auth.oauth_handler import oauth
+from ..config import settings # App settings
 
 router = APIRouter(
     prefix="/auth", # All routes in this file will start with /auth
@@ -60,7 +61,7 @@ async def login_via_google(request: Request):
 @router.get("/google/callback")
 async def google_auth_callback(request: Request, db: Session = Depends(get_db)):
     # Frontend URL - adjust port if your frontend runs on different port
-    FRONTEND_URL = "http://localhost:5173"  # Change to 3000 if using Create React App
+    FRONTEND_URL = settings.FRONTEND_URL  # Change to 3000 if using Create React App
     
     if not config.settings.GOOGLE_CLIENT_ID:
         raise HTTPException(status_code=500, detail="Google OAuth not configured")

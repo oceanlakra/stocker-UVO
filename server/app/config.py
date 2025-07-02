@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     DEFAULT_COMPARISON_N_RESULTS: int = 5
     DEFAULT_COMPARISON_SIMILARITY_THRESHOLD: float = 0.90
 
+
+    # Frontend URL
+    FRONTEND_URL: str
+    
     #Database Settings
     DATABASE_URL: str
     
