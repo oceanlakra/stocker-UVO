@@ -30,13 +30,14 @@ origins = [
     "http://localhost:5173", # Default Vite dev port
     "http://localhost:3000",
     "http://127.0.0.1:5173",
-    "https://stocker-ov.vercel.app"  # Default React dev port
+    "https://stocker-ov.vercel.app",
+    "https://stocker-docker-cvg7cva2awd0c3fr.canadacentral-01.azurewebsites.net"  # Default React dev port
     # Add other origins if needed
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"], # Allow all methods (GET, POST, etc.)
     allow_headers=["*"], # Allow all headers
