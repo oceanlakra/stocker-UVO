@@ -29,7 +29,8 @@ app.add_middleware(
 origins = [
     "http://localhost:5173", # Default Vite dev port
     "http://localhost:3000",
-    "http://127.0.0.1:5173" # Default React dev port
+    "http://127.0.0.1:5173",
+    "https://stocker-ov.vercel.app"  # Default React dev port
     # Add other origins if needed
 ]
 
